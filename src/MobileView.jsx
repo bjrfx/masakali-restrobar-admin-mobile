@@ -6,6 +6,7 @@ import Reservations from './Mobile/Pages/Reservations/Reservations';
 import Subscriptions from './Mobile/Pages/Subscriptions/Subscriptions';
 import Archive from './Mobile/Pages/Archive/Archive';
 import Menu from './Mobile/Pages/Menu/Menu';
+import ContactForm from './Mobile/Pages/ContactForm/ContactForm';
 import Profile from './Mobile/Pages/Profile/Profile';
 import Signin from './Common/Pages/Signin/Signin';
 import Signup from './Common/Pages/Signup/Signup';
@@ -38,6 +39,8 @@ const MobileView = () => {
       case 4:
         return <Menu />;
       case 5:
+        return <ContactForm />;
+      case 6:
         return <Profile />;
       default:
         return <Home />;

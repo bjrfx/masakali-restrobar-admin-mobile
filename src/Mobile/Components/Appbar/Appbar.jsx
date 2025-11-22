@@ -9,11 +9,12 @@ import SubscriptionsIcon from "@mui/icons-material/Subscriptions";
 import Archive from "@mui/icons-material/Archive";
 import MenuBook from "@mui/icons-material/MenuBook";
 import Person from "@mui/icons-material/Person";
+import ContactMailIcon from "@mui/icons-material/ContactMail";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import AppsIcon from '@mui/icons-material/Apps';
 const Appbar = ({ activeTab, setActiveTab, selectedIcon, selectedColor }) => {
-  const colors = ["primary", "danger", "success", "warning", "info", "neutral"];
+  const colors = ["primary", "danger", "success", "warning", "info", "neutral", "primary"];
   const [isAppbarOpen, setIsAppbarOpen] = useState(false);
   const [position, setPosition] = useState({ x: 16, y: window.innerHeight - 100 }); // Default to bottom-left
   const [dragging, setDragging] = useState(false);
@@ -221,6 +222,10 @@ const Appbar = ({ activeTab, setActiveTab, selectedIcon, selectedColor }) => {
               Menu
             </Tab>
             <Tab disableIndicator {...(activeTab === 5 && { color: colors[5] })}>
+              <ContactMailIcon sx={{ fontSize: 30 }} />
+              Contact
+            </Tab>
+            <Tab disableIndicator {...(activeTab === 6 && { color: colors[6] })}>
               <Person sx={{ fontSize: 30 }} />
               Profile
             </Tab>
