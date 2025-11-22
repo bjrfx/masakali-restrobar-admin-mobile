@@ -38,18 +38,40 @@ export default function TopNavbar({ onProfileClick }) {
         top: 0,
         left: 0,
         right: 0,
-        backgroundColor: 'background.body',
-        boxShadow: 'sm',
-        zIndex: 1200, // Ensure it is above other components
+        background: 'linear-gradient(180deg, rgba(30, 30, 50, 0.85), rgba(20, 20, 40, 0.9))',
+        backdropFilter: 'blur(30px) saturate(200%)',
+        WebkitBackdropFilter: 'blur(30px) saturate(200%)',
+        border: '1px solid rgba(255, 255, 255, 0.15)',
+        borderTop: 'none',
+        borderLeft: 'none',
+        borderRight: 'none',
+        boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 -1px 0 rgba(255, 255, 255, 0.1)',
+        zIndex: 1200,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         px: 2,
-        py: 1,
+        py: 1.5,
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '1px',
+          background: 'linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.6), transparent)',
+        },
       }}
     >
       {/* Left side: User's Name and "Dashboard" */}
-      <Typography level="h5" sx={{ fontWeight: 'bold' }}>
+      <Typography 
+        level="h5" 
+        sx={{ 
+          fontWeight: 'bold',
+          color: 'white',
+          textShadow: '0 2px 4px rgba(0, 0, 0, 0.4)',
+        }}
+      >
         {loading ? 'Loading...' : `${userData?.firstName || 'User'}'s Dashboard`}
       </Typography>
 
@@ -67,8 +89,14 @@ export default function TopNavbar({ onProfileClick }) {
           cursor: 'pointer',
           width: 40,
           height: 40,
-          border: '2px solid',
-          borderColor: 'primary.500',
+          border: '2px solid rgba(102, 126, 234, 0.8)',
+          boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1)',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'scale(1.1)',
+            boxShadow: '0 6px 20px rgba(102, 126, 234, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.2)',
+            border: '2px solid rgba(102, 126, 234, 1)',
+          },
         }}
       />
     </Box>
