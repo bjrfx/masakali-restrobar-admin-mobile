@@ -28,6 +28,7 @@ import ContactMailIcon from '@mui/icons-material/ContactMail';
 import EmailIcon from '@mui/icons-material/Email';
 import { db } from '../../../config/firebase';
 import { collection, onSnapshot, query, where, orderBy, limit } from 'firebase/firestore';
+import logo from '../../../logo.png';
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isBetween from 'dayjs/plugin/isBetween';
@@ -178,19 +179,46 @@ const Home = () => {
           backgroundColor: 'background.level1',
         }}
       >
-        {/* Greeting Section */}
-        <Box sx={{ mb: 3 }}>
-          <Typography level="h3" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-            {greeting}! 👋
-          </Typography>
-          <Typography level="body-md" sx={{ color: 'neutral.600' }}>
-            {currentTime.toLocaleDateString('en-IN', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </Typography>
+        {/* Logo and Greeting Section */}
+        <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box
+            sx={{
+              width: 60,
+              height: 60,
+              borderRadius: '50%',
+              background: 'white',
+              boxShadow: 'md',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              p: 1,
+              flexShrink: 0,
+            }}
+          >
+            <img 
+              src={logo} 
+              alt="Masakali Restrobar" 
+              style={{ 
+                width: '100%', 
+                height: '100%', 
+                objectFit: 'contain',
+                borderRadius: '50%'
+              }} 
+            />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography level="h3" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+              {greeting}! 👋
+            </Typography>
+            <Typography level="body-md" sx={{ color: 'neutral.600' }}>
+              {currentTime.toLocaleDateString('en-IN', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </Typography>
+          </Box>
         </Box>
 
         {/* Quick Stats Grid */}
