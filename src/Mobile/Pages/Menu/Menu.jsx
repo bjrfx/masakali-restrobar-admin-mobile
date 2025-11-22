@@ -301,15 +301,16 @@ const Menu = () => {
       <TopNavbar />
       <Box
         sx={{
-          pt: 8,
-          p: 2,
+          pt: 10,
+          pb: 10,
+          px: 2,
           backgroundColor: 'background.level1',
           minHeight: '100vh',
         }}
       >
         {/* Header */}
-        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-          <Box>
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: 2 }}>
+          <Box sx={{ flex: 1 }}>
             <Typography level="h3" sx={{ fontWeight: 'bold', mb: 0.5 }}>
               Menu Management 🍽️
             </Typography>
@@ -322,6 +323,7 @@ const Menu = () => {
             startDecorator={<AddIcon />}
             onClick={() => setOpenAddModal(true)}
             size="lg"
+            sx={{ flexShrink: 0 }}
           >
             Add Item
           </Button>
