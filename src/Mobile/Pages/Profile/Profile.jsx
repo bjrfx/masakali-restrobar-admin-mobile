@@ -24,7 +24,7 @@ export default function MyProfile() {
   const handleSignOut = async () => {
     try {
       await signOut(auth); // Firebase sign-out
-      navigate('/signin'); // Redirect to the Signin page
+      navigate('/'); // Redirect to the Signin page
     } catch (error) {
       console.error('Error signing out:', error.message);
     }
