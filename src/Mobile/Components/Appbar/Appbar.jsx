@@ -76,34 +76,44 @@ const Appbar = ({ activeTab, setActiveTab, selectedIcon, selectedColor }) => {
       setIsClicking(false);
     }, 200); // Reset after 200ms
   };
-//   Draggable Circle Color CSS
+
+  // Liquid-glass effect for draggable circle
   const circleCSS = {
-    backgroundColor: 'black',
-    opacity: 0.5,
-    // shadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-}
+    background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9))',
+    backdropFilter: 'blur(20px) saturate(180%)',
+    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+    border: '2px solid rgba(255, 255, 255, 0.4)',
+    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.15)',
+  };
 
   return (
     <>
       {/* Draggable Circle */}
-      <Box style = {circleCSS}
+      <Box 
+        style={circleCSS}
         sx={{
           position: "fixed",
-          zIndex: 9999, // Ensure it's above everything else
+          zIndex: 9999,
           width: "60px",
           height: "60px",
           borderRadius: "50%",
-          backgroundColor: "primary.500",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
           cursor: "grab",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-          touchAction: "none", // Prevent touch scrolling while dragging
+          touchAction: "none",
           left: `${position.x}px`,
           top: `${position.y}px`,
-          transition: "transform 0.2s ease, opacity 0.2s ease",
-          transform: isClicking ? "scale(0.9)" : "scale(1)", // Clicking animation
+          transition: "transform 0.2s ease, box-shadow 0.2s ease",
+          transform: isClicking ? "scale(0.9)" : "scale(1)",
+          '&:hover': {
+            boxShadow: '0 12px 40px 0 rgba(102, 126, 234, 0.6), inset 0 0 25px rgba(255, 255, 255, 0.25)',
+            transform: 'scale(1.05)',
+            background: 'linear-gradient(135deg, rgba(102, 126, 234, 1), rgba(118, 75, 162, 1))',
+          },
+          '&:active': {
+            transform: 'scale(0.95)',
+          },
         }}
         onMouseDown={(e) => {
           handleDragStart(e);
@@ -116,28 +126,17 @@ const Appbar = ({ activeTab, setActiveTab, selectedIcon, selectedColor }) => {
         onMouseUp={() => !dragging && toggleAppbar()}
         onTouchEnd={() => !dragging && toggleAppbar()}
       >
-        {isAppbarOpen ? (
-          <AppsIcon
-            sx={{
-              color: "white",
-              fontSize: "30px",
-            //   opacity: dragging ? 0.6 : 1, // Lower opacity while dragging
-              transition: "opacity 0.2s ease",
-            }}
-          />
-        ) : (
-          <AppsIcon
-            sx={{
-              color: "white",
-              fontSize: "30px",
-            //   opacity: dragging ? 0.6 : 1, // Lower opacity while dragging
-              transition: "opacity 0.2s ease",
-            }}
-          />
-        )}
+        <AppsIcon
+          sx={{
+            color: "white",
+            fontSize: "32px",
+            filter: "drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))",
+            transition: "all 0.2s ease",
+          }}
+        />
       </Box>
 
-      {/* Appbar */}
+      {/* Appbar with Liquid-Glass Effect */}
       <Box
         sx={{
           position: "fixed",
@@ -148,12 +147,25 @@ const Appbar = ({ activeTab, setActiveTab, selectedIcon, selectedColor }) => {
           transform: isAppbarOpen ? "translateY(0)" : "translateY(100%)",
           transition: "transform 0.3s ease",
           p: 2,
-          borderTopLeftRadius: "12px",
-          borderTopRightRadius: "12px",
-          bgcolor: `${"var(--colors-index)"}.500`,
+          borderTopLeftRadius: "24px",
+          borderTopRightRadius: "24px",
+          background: 'linear-gradient(135deg, rgba(30, 30, 50, 0.85), rgba(20, 20, 40, 0.9))',
+          backdropFilter: 'blur(30px) saturate(200%)',
+          WebkitBackdropFilter: 'blur(30px) saturate(200%)',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          borderBottom: 'none',
+          boxShadow: '0 -8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
           overflowX: "auto",
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '1px',
+            background: 'linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.6), transparent)',
+          },
         }}
-        style={{ "--colors-index": colors[activeTab % colors.length] }}
       >
         <Tabs
           size="lg"
@@ -162,27 +174,43 @@ const Appbar = ({ activeTab, setActiveTab, selectedIcon, selectedColor }) => {
           onChange={(event, value) => setActiveTab(value)}
           sx={(theme) => ({
             p: 1,
-            borderRadius: 16,
+            borderRadius: 20,
             maxWidth: "100%",
             mx: "auto",
-            boxShadow: theme.shadow.sm,
+            boxShadow: 'none',
             display: "flex",
             whiteSpace: "nowrap",
-            "--joy-shadowChannel":
-              theme.vars.palette[colors[activeTab % colors.length]]
-                ? theme.vars.palette[colors[activeTab % colors.length]]
-                    .darkChannel
-                : theme.vars.palette.primary.darkChannel,
+            background: 'transparent',
             [`& .${tabClasses.root}`]: {
               py: 1,
               flex: "1 0 auto",
-              flexDirection: "column", // Stack icon and text vertically
-              alignItems: "center", // Center-align content
-              transition: "0.3s",
+              flexDirection: "column",
+              alignItems: "center",
+              transition: "all 0.3s ease",
               fontWeight: "md",
-              fontSize: "md",
+              fontSize: "xs",
+              color: 'rgba(255, 255, 255, 0.85)',
+              borderRadius: '16px',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
               [`&:not(.${tabClasses.selected}):not(:hover)`]: {
                 opacity: 0.7,
+              },
+              [`&:hover`]: {
+                background: 'rgba(102, 126, 234, 0.3)',
+                backdropFilter: 'blur(10px)',
+                transform: 'translateY(-2px)',
+                color: 'white',
+                opacity: 1,
+              },
+              [`&.${tabClasses.selected}`]: {
+                background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.6), rgba(118, 75, 162, 0.6))',
+                backdropFilter: 'blur(15px)',
+                boxShadow: '0 4px 16px rgba(102, 126, 234, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(102, 126, 234, 0.5)',
+                color: 'white',
+                fontWeight: 'bold',
+                transform: 'translateY(-4px)',
+                textShadow: '0 2px 4px rgba(0, 0, 0, 0.4)',
               },
             },
           })}
@@ -199,34 +227,35 @@ const Appbar = ({ activeTab, setActiveTab, selectedIcon, selectedColor }) => {
               flexWrap: "nowrap",
               overflowX: "auto",
               minWidth: "100%",
+              background: 'transparent',
             }}
           >
-            <Tab disableIndicator {...(activeTab === 0 && { color: colors[0] })}>
-              <HomeRoundedIcon sx={{ fontSize: 30 }} />
+            <Tab disableIndicator>
+              <HomeRoundedIcon sx={{ fontSize: 28, mb: 0.5 }} />
               Home
             </Tab>
-            <Tab disableIndicator {...(activeTab === 1 && { color: colors[1] })}>
-              <Book sx={{ fontSize: 30 }} />
+            <Tab disableIndicator>
+              <Book sx={{ fontSize: 28, mb: 0.5 }} />
               Reservations
             </Tab>
-            <Tab disableIndicator {...(activeTab === 2 && { color: colors[2] })}>
-              <SubscriptionsIcon sx={{ fontSize: 30 }} />
+            <Tab disableIndicator>
+              <SubscriptionsIcon sx={{ fontSize: 28, mb: 0.5 }} />
               Subscriptions
             </Tab>
-            <Tab disableIndicator {...(activeTab === 3 && { color: colors[3] })}>
-              <Archive sx={{ fontSize: 30 }} />
+            <Tab disableIndicator>
+              <Archive sx={{ fontSize: 28, mb: 0.5 }} />
               Archive
             </Tab>
-            <Tab disableIndicator {...(activeTab === 4 && { color: colors[4] })}>
-              <MenuBook sx={{ fontSize: 30 }} />
+            <Tab disableIndicator>
+              <MenuBook sx={{ fontSize: 28, mb: 0.5 }} />
               Menu
             </Tab>
-            <Tab disableIndicator {...(activeTab === 5 && { color: colors[5] })}>
-              <ContactMailIcon sx={{ fontSize: 30 }} />
+            <Tab disableIndicator>
+              <ContactMailIcon sx={{ fontSize: 28, mb: 0.5 }} />
               Contact
             </Tab>
-            <Tab disableIndicator {...(activeTab === 6 && { color: colors[6] })}>
-              <Person sx={{ fontSize: 30 }} />
+            <Tab disableIndicator>
+              <Person sx={{ fontSize: 28, mb: 0.5 }} />
               Profile
             </Tab>
           </TabList>
