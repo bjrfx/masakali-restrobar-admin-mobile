@@ -53,6 +53,8 @@ const Menu = () => {
   const [sortBy, setSortBy] = useState('name-asc');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
+  const [activeCategory, setActiveCategory] = useState('');
+  const categoryRefs = React.useRef({});
 
   // Modal states
   const [openAddModal, setOpenAddModal] = useState(false);
@@ -102,6 +104,30 @@ const Menu = () => {
 
     return () => unsubscribe();
   }, []);
+
+  // Scroll detection for category indicator
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + window.innerHeight / 2;
+      
+      // Find which category is currently in view
+      let currentCategory = '';
+      Object.entries(categoryRefs.current).forEach(([category, ref]) => {
+        if (ref && ref.offsetTop <= scrollPosition) {
+          currentCategory = category;
+        }
+      });
+      
+      if (currentCategory && currentCategory !== activeCategory) {
+        setActiveCategory(currentCategory);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Check initial position
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [activeCategory]);
 
   // Get unique categories
   const categories = useMemo(() => {
@@ -158,6 +184,18 @@ const Menu = () => {
 
     return filtered;
   }, [menuItems, searchQuery, filterCategory, sortBy, selectedTab]);
+
+  // Group items by category for display
+  const groupedItems = useMemo(() => {
+    const groups = {};
+    filteredMenuItems.forEach((item) => {
+      if (!groups[item.category]) {
+        groups[item.category] = [];
+      }
+      groups[item.category].push(item);
+    });
+    return groups;
+  }, [filteredMenuItems]);
 
   const handleAddItem = async () => {
     try {
@@ -443,7 +481,7 @@ const Menu = () => {
           </Chip>
         </Box>
 
-        {/* Menu Items Grid */}
+        {/* Menu Items Grid - Grouped by Category */}
         {loading ? (
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 2 }}>
             {[1, 2, 3].map((i) => (
@@ -451,8 +489,37 @@ const Menu = () => {
             ))}
           </Box>
         ) : filteredMenuItems.length > 0 ? (
-          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 2 }}>
-            {filteredMenuItems.map((item, index) => (
+          <Box>
+            {Object.entries(groupedItems).map(([category, items]) => (
+              <Box
+                key={category}
+                ref={(el) => {
+                  categoryRefs.current[category] = el;
+                }}
+                sx={{ mb: 4 }}
+              >
+                {/* Category Header */}
+                <Typography
+                  level="h4"
+                  sx={{
+                    fontWeight: 'bold',
+                    mb: 2,
+                    textTransform: 'capitalize',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                  }}
+                >
+                  <CategoryIcon sx={{ color: 'primary.500' }} />
+                  {category}
+                  <Chip size="sm" variant="soft" color="primary">
+                    {items.length}
+                  </Chip>
+                </Typography>
+
+                {/* Items in this category */}
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 2 }}>
+                  {items.map((item, index) => (
               <Card
                 key={`${item.category}-${item.itemIndex}`}
                 variant="outlined"
@@ -553,6 +620,9 @@ const Menu = () => {
                   </Box>
                 </CardContent>
               </Card>
+            ))}
+                </Box>
+              </Box>
             ))}
           </Box>
         ) : (
@@ -839,6 +909,120 @@ const Menu = () => {
             </Box>
           </ModalDialog>
         </Modal>
+
+        {/* Scroll-Aware Category Indicator with Liquid-Glass Effect */}
+        {!loading && Object.keys(groupedItems).length > 1 && !searchQuery && filterCategory === 'all' && (
+          <Box
+            sx={{
+              position: 'sticky',
+              bottom: 90,
+              left: 0,
+              right: 0,
+              zIndex: 999,
+              display: 'flex',
+              justifyContent: 'center',
+              mb: 2,
+              mt: -8,
+              pointerEvents: 'none',
+            }}
+          >
+            <Box
+              sx={{
+                background: 'linear-gradient(135deg, rgba(15, 15, 30, 0.98), rgba(10, 10, 25, 0.98))',
+                backdropFilter: 'blur(30px) saturate(200%)',
+                WebkitBackdropFilter: 'blur(30px) saturate(200%)',
+                border: '1.5px solid rgba(102, 126, 234, 0.4)',
+                borderRadius: '24px',
+                boxShadow: '0 12px 40px 0 rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(102, 126, 234, 0.15)',
+                p: { xs: 1, sm: 1.5 },
+                display: 'flex',
+                gap: { xs: 0.75, sm: 1 },
+                overflowX: 'auto',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                pointerEvents: 'auto',
+                maxWidth: { xs: '95%', sm: '85%', md: '75%' },
+                width: 'fit-content',
+                '&::-webkit-scrollbar': {
+                  height: '6px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  background: 'rgba(102, 126, 234, 0.1)',
+                  borderRadius: '3px',
+                  margin: '4px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9))',
+                  borderRadius: '3px',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, rgba(102, 126, 234, 1), rgba(118, 75, 162, 1))',
+                  },
+                },
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '1.5px',
+                  background: 'linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.9), transparent)',
+                },
+              }}
+            >
+              {Object.keys(groupedItems).map((category) => (
+                <Chip
+                  key={category}
+                  variant={activeCategory === category ? 'solid' : 'soft'}
+                  color={activeCategory === category ? 'primary' : 'neutral'}
+                  size="md"
+                  onClick={() => {
+                    const element = categoryRefs.current[category];
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                  }}
+                  sx={{
+                    textTransform: 'capitalize',
+                    fontWeight: activeCategory === category ? 'bold' : '700',
+                    fontSize: { xs: '0.85rem', sm: '0.95rem' },
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    flexShrink: 0,
+                    px: { xs: 2, sm: 2.5 },
+                    py: { xs: 0.75, sm: 1 },
+                    minHeight: { xs: '32px', sm: '36px' },
+                    background: activeCategory === category
+                      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                      : 'rgba(255, 255, 255, 0.95)',
+                    color: activeCategory === category ? '#FFFFFF' : '#1a1a2e',
+                    backdropFilter: 'blur(10px)',
+                    border: activeCategory === category
+                      ? '1.5px solid rgba(102, 126, 234, 0.8)'
+                      : '1px solid rgba(102, 126, 234, 0.3)',
+                    boxShadow: activeCategory === category
+                      ? '0 8px 24px rgba(102, 126, 234, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.2)'
+                      : '0 2px 8px rgba(0, 0, 0, 0.4)',
+                    transform: activeCategory === category ? 'scale(1.1)' : 'scale(1)',
+                    '&:hover': {
+                      transform: 'scale(1.1)',
+                      background: activeCategory === category
+                        ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                        : 'rgba(255, 255, 255, 1)',
+                      boxShadow: '0 8px 24px rgba(102, 126, 234, 0.7)',
+                      borderColor: 'rgba(102, 126, 234, 0.9)',
+                      color: activeCategory === category ? '#FFFFFF' : '#1a1a2e',
+                    },
+                    '&:active': {
+                      transform: 'scale(1.05)',
+                    },
+                  }}
+                >
+                  {category}
+                </Chip>
+              ))}
+            </Box>
+          </Box>
+        )}
       </Box>
     </Box>
   );
