@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/joy/Box";
 import Tabs from "@mui/joy/Tabs";
 import TabList from "@mui/joy/TabList";
@@ -13,13 +13,59 @@ import ContactMailIcon from "@mui/icons-material/ContactMail";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import AppsIcon from '@mui/icons-material/Apps';
+import { useAuth } from '../../../config/AuthProvider';
+import { db } from '../../../config/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
+
 const Appbar = ({ activeTab, setActiveTab, selectedIcon, selectedColor }) => {
+  const { currentUser } = useAuth();
   const colors = ["primary", "danger", "success", "warning", "info", "neutral", "primary"];
   const [isAppbarOpen, setIsAppbarOpen] = useState(false);
-  const [position, setPosition] = useState({ x: 16, y: window.innerHeight - 100 }); // Default to bottom-left
+  const [fixedAppIcon, setFixedAppIcon] = useState(false);
+  
+  // Calculate fixed position (center bottom, above navbar)
+  const getFixedPosition = () => ({
+    x: window.innerWidth / 2 - 30, // Center horizontally (30 = half of circle width)
+    y: window.innerHeight - 150, // 150px from bottom (above navbar)
+  });
+  
+  const [position, setPosition] = useState(getFixedPosition()); // Default position
   const [dragging, setDragging] = useState(false);
   const [startPosition, setStartPosition] = useState(null); // Track drag start position
   const [isClicking, setIsClicking] = useState(false); // Handle click animation
+
+  // Listen to Firebase settings changes in real-time
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const userDocRef = doc(db, 'users', currentUser.uid);
+    const unsubscribe = onSnapshot(userDocRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const data = docSnapshot.data();
+        const isFixed = data.fixedAppIcon || false;
+        setFixedAppIcon(isFixed);
+        
+        // If fixed, reset to center position
+        if (isFixed) {
+          setPosition(getFixedPosition());
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [currentUser]);
+
+  // Update fixed position on window resize
+  useEffect(() => {
+    if (!fixedAppIcon) return;
+
+    const handleResize = () => {
+      setPosition(getFixedPosition());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [fixedAppIcon]);
 
   const toggleAppbar = () => {
     if (!dragging) {
@@ -28,6 +74,8 @@ const Appbar = ({ activeTab, setActiveTab, selectedIcon, selectedColor }) => {
   };
 
   const handleDrag = (e) => {
+    if (fixedAppIcon) return; // Don't allow dragging if fixed
+    
     const isTouch = e.type === "touchmove";
     const clientX = isTouch ? e.touches[0].clientX : e.clientX;
     const clientY = isTouch ? e.touches[0].clientY : e.clientY;
@@ -40,6 +88,8 @@ const Appbar = ({ activeTab, setActiveTab, selectedIcon, selectedColor }) => {
   };
 
   const handleDragEnd = (e) => {
+    if (fixedAppIcon) return; // Don't allow dragging if fixed
+    
     e.preventDefault();
     document.removeEventListener("mousemove", handleDrag);
     document.removeEventListener("touchmove", handleDrag);
@@ -57,6 +107,8 @@ const Appbar = ({ activeTab, setActiveTab, selectedIcon, selectedColor }) => {
   };
 
   const handleDragStart = (e) => {
+    if (fixedAppIcon) return; // Don't allow dragging if fixed
+    
     e.preventDefault();
     const isTouch = e.type === "touchstart";
     const clientX = isTouch ? e.touches[0].clientX : e.clientX;
@@ -100,11 +152,11 @@ const Appbar = ({ activeTab, setActiveTab, selectedIcon, selectedColor }) => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          cursor: "grab",
+          cursor: fixedAppIcon ? "pointer" : "grab",
           touchAction: "none",
           left: `${position.x}px`,
           top: `${position.y}px`,
-          transition: "transform 0.2s ease, box-shadow 0.2s ease",
+          transition: fixedAppIcon ? "all 0.3s ease" : "transform 0.2s ease, box-shadow 0.2s ease",
           transform: isClicking ? "scale(0.9)" : "scale(1)",
           '&:hover': {
             boxShadow: '0 12px 40px 0 rgba(102, 126, 234, 0.6), inset 0 0 25px rgba(255, 255, 255, 0.25)',
@@ -116,11 +168,15 @@ const Appbar = ({ activeTab, setActiveTab, selectedIcon, selectedColor }) => {
           },
         }}
         onMouseDown={(e) => {
-          handleDragStart(e);
+          if (!fixedAppIcon) {
+            handleDragStart(e);
+          }
           handleClickAnimation();
         }}
         onTouchStart={(e) => {
-          handleDragStart(e);
+          if (!fixedAppIcon) {
+            handleDragStart(e);
+          }
           handleClickAnimation();
         }}
         onMouseUp={() => !dragging && toggleAppbar()}
