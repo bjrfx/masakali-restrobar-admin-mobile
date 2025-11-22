@@ -97,8 +97,9 @@ const ContactForm = () => {
       <TopNavbar />
       <Box
         sx={{
-          pt: 8,
-          p: 2,
+          pt: 10,
+          pb: 10,
+          px: 2,
           backgroundColor: 'background.level1',
           minHeight: '100vh',
         }}
